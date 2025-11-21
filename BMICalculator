@@ -1,0 +1,146 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(BMICalculatorApp());
+}
+
+class BMICalculatorApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: BMIScreen(),
+    );
+  }
+}
+
+class BMIScreen extends StatefulWidget {
+  @override
+  State<BMIScreen> createState() => _BMIScreenState();
+}
+
+class _BMIScreenState extends State<BMIScreen> {
+  final TextEditingController ageController = TextEditingController();
+  final TextEditingController heightController = TextEditingController();
+  final TextEditingController weightController = TextEditingController();
+
+  String result = "";
+
+  // ------------------------------
+  //  BMI FUNCTION
+  // ------------------------------
+  double calculateBMI(double height, double weight) {
+    double heightInMeter = height / 100; // convert cm → meter
+    return weight / (heightInMeter * heightInMeter);
+  }
+
+  // ------------------------------
+  //  VALIDATION + CALCULATE
+  // ------------------------------
+  void onCalculate() {
+    String age = ageController.text.trim();
+    String height = heightController.text.trim();
+    String weight = weightController.text.trim();
+
+    if (age.isEmpty || height.isEmpty || weight.isEmpty) {
+      setState(() => result = "Please fill all fields");
+      return;
+    }
+
+    double? ageVal = double.tryParse(age);
+    double? heightVal = double.tryParse(height);
+    double? weightVal = double.tryParse(weight);
+
+    if (ageVal == null || heightVal == null || weightVal == null) {
+      setState(() => result = "Invalid input! Enter numbers only.");
+      return;
+    }
+
+    if (ageVal <= 0 || heightVal <= 0 || weightVal <= 0) {
+      setState(() => result = "Values must be greater than zero.");
+      return;
+    }
+
+    double bmi = calculateBMI(heightVal, weightVal);
+    setState(() => result = "Your BMI is: ${bmi.toStringAsFixed(2)}");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("BMI Calculator"),
+        backgroundColor: Colors.green,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            // AGE
+            TextField(
+              controller: ageController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Age",
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            SizedBox(height: 15),
+
+            // HEIGHT
+            TextField(
+              controller: heightController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Height (cm)",
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            SizedBox(height: 15),
+
+            // WEIGHT
+            TextField(
+              controller: weightController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: "Weight (kg)",
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            SizedBox(height: 20),
+
+            // BUTTON
+            ElevatedButton(
+              onPressed: onCalculate,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+              ),
+              child: Text(
+                "CALCULATE",
+                style: TextStyle(fontSize: 20, color: Colors.white),
+              ),
+            ),
+
+            SizedBox(height: 40),
+
+            // RESULT
+            Text(
+              result,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.blueAccent,
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
