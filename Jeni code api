@@ -1,0 +1,109 @@
+// put this in a new file e.g. lib/screens/api_response_screen.dart
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class ApiResponseScreen extends StatefulWidget {
+  const ApiResponseScreen({super.key});
+
+  @override
+  State<ApiResponseScreen> createState() => _ApiResponseScreenState();
+}
+
+class _ApiResponseScreenState extends State<ApiResponseScreen> {
+  String? _rawJson;
+  String? _error;
+  bool _loading = false;
+
+  Future<void> fetchApi() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+
+    try {
+      final uri = Uri.parse('https://www.anniecabs.com/LJ/index.php/api/get_data_c');
+
+      final response = await http
+          .get(uri)
+          .timeout(const Duration(seconds: 10)); // avoid hanging forever
+
+      // print to debug console (visible in Run/Debug Console or terminal)
+      debugPrint('HTTP ${response.statusCode} - body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // try to decode JSON pretty for display
+        try {
+          final decoded = jsonDecode(response.body);
+          final pretty = const JsonEncoder.withIndent('  ').convert(decoded);
+          setState(() => _rawJson = pretty);
+        } catch (e) {
+          // not valid JSON — show raw body
+          setState(() => _rawJson = response.body);
+        }
+      } else {
+        setState(() => _error = 'Server returned status ${response.statusCode}');
+      }
+    } on http.ClientException catch (e) {
+      setState(() => _error = 'Client exception: $e');
+    } on FormatException catch (e) {
+      setState(() => _error = 'Format error: $e');
+    } on Exception catch (e) {
+      setState(() => _error = 'Error: $e');
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // optionally fetch immediately:
+    // fetchApi();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('API Response Viewer')),
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            ElevatedButton.icon(
+              onPressed: _loading ? null : fetchApi,
+              icon: const Icon(Icons.cloud_download),
+              label: Text(_loading ? 'Loading...' : 'Fetch API'),
+            ),
+            const SizedBox(height: 12),
+            if (_error != null)
+              Container(
+                padding: const EdgeInsets.all(12),
+                color: Colors.red.shade50,
+                child: Text('Error: $_error', style: const TextStyle(color: Colors.red)),
+              ),
+            if (_rawJson != null) ...[
+              const SizedBox(height: 12),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: SelectableText(
+                    _rawJson!,
+                    style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                  ),
+                ),
+              ),
+            ] else if (_error == null && !_loading)
+              Expanded(
+                child: Center(
+                  child: Text(
+                    'No data yet. Tap "Fetch API" above.',
+                    style: TextStyle(color: Colors.grey.shade600),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
