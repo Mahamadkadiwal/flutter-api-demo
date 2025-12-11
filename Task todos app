@@ -1,0 +1,137 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const TaskApp());
+}
+
+class TaskApp extends StatelessWidget {
+  const TaskApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: const TaskHomePage(),
+    );
+  }
+}
+
+class TaskHomePage extends StatefulWidget {
+  const TaskHomePage({super.key});
+
+  @override
+  State<TaskHomePage> createState() => _TaskHomePageState();
+}
+
+class _TaskHomePageState extends State<TaskHomePage> {
+  List<Map<String, dynamic>> tasks = [];
+  TextEditingController taskController = TextEditingController();
+
+  void addTask() {
+    if (taskController.text.trim().isEmpty) return;
+
+    setState(() {
+      tasks.add({
+        "title": taskController.text,
+        "completed": false,
+      });
+    });
+
+    taskController.clear();
+    Navigator.pop(context);
+  }
+
+  void deleteTask(int index) {
+    setState(() {
+      tasks.removeAt(index);
+    });
+  }
+
+  void toggleComplete(int index, bool? value) {
+    setState(() {
+      tasks[index]["completed"] = value!;
+    });
+  }
+
+  void openAddTaskDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Add Task"),
+          content: TextField(
+            controller: taskController,
+            decoration: const InputDecoration(
+              labelText: "Task Name",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: addTask,
+              child: const Text("Add"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Task Manager"),
+        centerTitle: true,
+      ),
+
+      floatingActionButton: FloatingActionButton(
+        onPressed: openAddTaskDialog,
+        child: const Icon(Icons.add),
+      ),
+
+      body: tasks.isEmpty
+          ? const Center(
+              child: Text(
+                "No tasks added yet!",
+                style: TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+            )
+          : ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  child: ListTile(
+                    leading: Checkbox(
+                      value: tasks[index]["completed"],
+                      onChanged: (value) {
+                        toggleComplete(index, value);
+                      },
+                    ),
+
+                    title: Text(
+                      tasks[index]["title"],
+                      style: TextStyle(
+                        fontSize: 18,
+                        decoration: tasks[index]["completed"]
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                      ),
+                    ),
+
+                    trailing: IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () => deleteTask(index),
+                    ),
+                  ),
+                );
+              },
+            ),
+    );
+  }
+}
