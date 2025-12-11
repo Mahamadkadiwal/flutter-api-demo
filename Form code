@@ -1,0 +1,142 @@
+import 'package:flutter/material.dart';
+
+class ContactUsForm extends StatefulWidget {
+  const ContactUsForm({super.key});
+
+  @override
+  State<ContactUsForm> createState() => _ContactUsFormState();
+}
+
+class _ContactUsFormState extends State<ContactUsForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  TextEditingController nameCtrl = TextEditingController();
+  TextEditingController emailCtrl = TextEditingController();
+  TextEditingController messageCtrl = TextEditingController();
+
+  bool isValid = false;
+
+  // ------------------------
+  // EMAIL VALIDATION
+  // ------------------------
+  bool isEmailValid(String email) {
+    return RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  }
+
+  void validateForm() {
+    setState(() {
+      isValid = _formKey.currentState!.validate();
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Real-time validation
+    nameCtrl.addListener(validateForm);
+    emailCtrl.addListener(validateForm);
+    messageCtrl.addListener(validateForm);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Contact Us"),
+        centerTitle: true,
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+
+        child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction, // Real-time validation
+
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              // NAME FIELD
+              TextFormField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: "Name",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Name is required";
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 15),
+
+              // EMAIL FIELD
+              TextFormField(
+                controller: emailCtrl,
+                decoration: const InputDecoration(
+                  labelText: "Email",
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.emailAddress,
+
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Email is required";
+                  }
+                  if (!isEmailValid(value)) {
+                    return "Enter a valid email address";
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 15),
+
+              // MESSAGE FIELD
+              TextFormField(
+                controller: messageCtrl,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  labelText: "Message",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return "Message is required";
+                  }
+                  if (value.length < 10) {
+                    return "Message should be at least 10 characters";
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 25),
+
+              // SUBMIT BUTTON
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isValid
+                      ? () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text("Form Submitted Successfully")),
+                          );
+                        }
+                      : null,
+                  child: const Text("Submit"),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
