@@ -1,0 +1,150 @@
+import 'package:flutter/material.dart';
+
+class HomeScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        leading: Icon(Icons.notifications, color: Colors.black),
+        actions: [
+          Icon(Icons.menu, color: Colors.black),
+          SizedBox(width: 12),
+        ],
+      ),
+
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+
+            // Message
+            Text(
+              "Welcome Back!",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+
+            SizedBox(height: 15),
+
+            // Search Bar
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Search...",
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+
+            SizedBox(height: 25),
+
+            // --- 3 ROWS OF 3 CIRCLES EACH ---
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                CircleAvatar(radius: 35, backgroundImage: AssetImage("assets/user1.jpg")),
+                CircleAvatar(radius: 35, backgroundImage: AssetImage("assets/user2.jpg")),
+                CircleAvatar(radius: 35, backgroundImage: AssetImage("assets/user3.jpg")),
+              ],
+            ),
+
+            SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                CircleAvatar(radius: 35, backgroundImage: AssetImage("assets/user4.jpg")),
+                CircleAvatar(radius: 35, backgroundImage: AssetImage("assets/user5.jpg")),
+                CircleAvatar(radius: 35, backgroundImage: AssetImage("assets/user6.jpg")),
+              ],
+            ),
+
+            SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                CircleAvatar(radius: 35, backgroundImage: AssetImage("assets/user7.jpg")),
+                CircleAvatar(radius: 35, backgroundImage: AssetImage("assets/user8.jpg")),
+                CircleAvatar(radius: 35, backgroundImage: AssetImage("assets/user9.jpg")),
+              ],
+            ),
+
+            SizedBox(height: 30),
+
+            // --- 4 ROWS OF 2 SQUARE BOXES ---
+            Row(
+              children: [
+                Expanded(child: squareBox("Flutter", "assets/flutter.png")),
+                SizedBox(width: 15),
+                Expanded(child: squareBox("Python", "assets/python.png")),
+              ],
+            ),
+
+            SizedBox(height: 15),
+
+            Row(
+              children: [
+                Expanded(child: squareBox("Java", "assets/java.png")),
+                SizedBox(width: 15),
+                Expanded(child: squareBox("C++", "assets/cpp.png")),
+              ],
+            ),
+
+            SizedBox(height: 15),
+
+            Row(
+              children: [
+                Expanded(child: squareBox("React", "assets/react.png")),
+                SizedBox(width: 15),
+                Expanded(child: squareBox("Node", "assets/node.png")),
+              ],
+            ),
+
+            SizedBox(height: 15),
+
+            Row(
+              children: [
+                Expanded(child: squareBox("AI", "assets/ai.png")),
+                SizedBox(width: 15),
+                Expanded(child: squareBox("ML", "assets/ml.png")),
+              ],
+            ),
+          ],
+        ),
+      ),
+
+      bottomNavigationBar: BottomNavigationBar(
+        selectedItemColor: Colors.blue,
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.search), label: "Search"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
+      ),
+    );
+  }
+
+  // SIMPLE REUSABLE SQUARE BOX
+  Widget squareBox(String title, String img) {
+    return Container(
+      height: 140,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(img, height: 60),
+          SizedBox(height: 10),
+          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+}
